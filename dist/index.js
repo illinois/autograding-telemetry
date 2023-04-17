@@ -9716,7 +9716,7 @@ const sendJSON = (json, endpoint) => {
   })
   req.on('timeout', () => {
     core.setFailed(`Request to ${endpoint} exceeded 5000ms timeout`);
-    request.destroy();
+    req.destroy();
     return;
   });
   req.write(json);

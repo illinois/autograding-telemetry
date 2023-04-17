@@ -43,7 +43,7 @@ const sendJSON = (json, endpoint) => {
  */
 const uploadArtifact = async(json, assignmentName) => {
   const artifactClient = artifact.create();
-  const artifactName = assignmentName ? `${assignment}-telemetry` : 'telemetry';
+  const artifactName = assignmentName ? `${assignmentName}-telemetry` : 'telemetry';
   const filepath = 'temp.json'
   fs.writeFileSync(filepath, json);
   const response = await artifactClient.uploadArtifact(artifactName, [filepath], '.', {});

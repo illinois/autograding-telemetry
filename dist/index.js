@@ -9707,12 +9707,12 @@ const sendJSON = (json, endpoint) => {
     timeout: 5000
   }
   const req = http.request(options, (response) => {
-    req.on('error', (err) => {
-      core.setFailed(`Request to given endpoint failed with error: ${err}`);
-    })
     if (response.statusCode >= 400) {
       core.setFailed(`Request to given endpoint return error response code ${response.statusCode}`);
     }
+  })
+  req.on('error', (err) => {
+    core.setFailed(`Request to given endpoint failed with error: ${err}`);
   })
   req.on('timeout', () => {
     core.setFailed(`Request to ${endpoint} exceeded 5000ms timeout`);

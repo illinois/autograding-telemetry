@@ -9743,7 +9743,7 @@ const uploadArtifact = async(json, assignmentName) => {
 
 const main = async() => {
   var json = {}
-  const endpoint = "http://192.168.10.10:24000/"; // core.getInput('endpoint');
+  const endpoint = core.getInput('endpoint');
   const createArtifact = core.getInput('create_artifact');
   // Exit early if endpoint and create_artifact are false-y values
   if (!endpoint && !createArtifact) {

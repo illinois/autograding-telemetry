@@ -20,7 +20,8 @@ const sendJSON = (json, endpoint) => {
     port: url.port,
     path: url.pathname,
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Content-Length': json.length}
+    headers: { 'Content-Type': 'application/json', 'Content-Length': json.length},
+    timeout: 5000
   }
   const req = http.request(options, (response) => {
     req.on('error', (err) => {
@@ -30,6 +31,11 @@ const sendJSON = (json, endpoint) => {
       core.setFailed(`Request to given endpoint return error response code ${response.statusCode}`);
     }
   })
+  req.on('timeout', () => {
+    core.setFailed(`Request to ${endpoint} exceeded 5000ms timeout`);
+    request.destroy();
+    return;
+  });
   req.write(json);
   req.end();
 }
@@ -54,7 +60,7 @@ const uploadArtifact = async(json, assignmentName) => {
 
 const main = async() => {
   var json = {}
-  const endpoint = core.getInput('endpoint');
+  const endpoint = "http://192.168.10.10:24000/"; // core.getInput('endpoint');
   const createArtifact = core.getInput('create_artifact');
   // Exit early if endpoint and create_artifact are false-y values
   if (!endpoint && !createArtifact) {
@@ -79,6 +85,7 @@ const main = async() => {
   if (createArtifact) {
     await uploadArtifact(json, assignment);
   }
+  return;
 }
 
 main();

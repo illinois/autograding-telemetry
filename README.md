@@ -38,7 +38,7 @@ autograding:
 ```
 
 Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requests, the server will receive the following JSON:
-```json
+```js
 {
   date: "2023-04-21T15:23:47Z", // A UTC formatted timestamp
   user: "jackskennel",
@@ -57,5 +57,5 @@ Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requ
 |`log_date`|No|Boolean describing if `telemetry` should log the date and time of the workflow run.|`true`|
 |`user`|No|Username of the user that triggered the workflow run. If this field is left empty, this information will not be logged.|`''`|
 |`autograding_status`|No|`illinois/autograding`'s exit code. If this field is left blank, this information is not logged.|`''`|
-|`points`|No|String containing the ratio of points earned to total points from the `autograding` action. If the `autograding` action has not been used in the same workflow as this action or if this action is used earlier than `autograding` in a workflow, this field should always be left to its default value.|`null`|
+|`points`|No|String containing the ratio of points earned to total points from the `autograding` action. If the `autograding` action has not been used in the same workflow as this action or if this action is used earlier than `autograding` in a workflow, this field should always be left to its default value.|`''`|
 |`assignment`|No|The name of the assignment for which data is being logged. If empty, this field will not be entered.|`''`|

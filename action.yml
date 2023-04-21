@@ -34,7 +34,7 @@ inputs:
     required: false
   points:
     description: >
-      Integer containing the number of points that were earned from the `autograding` action. 
+      String containing the ratio of points earned to total points from the `autograding` action. 
       If the `autograding` action has not been used in the same workflow as this action or if this
       action is used earlier than `autograding` in a workflow, this field should always be left
       to its default value.

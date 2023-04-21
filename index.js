@@ -75,7 +75,7 @@ const main = async() => {
   if (logDate) { json['date'] = new Date(); }
   if (points) { json['points'] = points; }
   if (assignment) { json['assignment'] = assignment; }
-  if (autogradingStatus !== null) { json['autograding_status'] = autogradingStatus; }
+  if (autogradingStatus !== '') { json['autograding_status'] = autogradingStatus; }
   json = JSON.stringify(json);
   // Send JSON to specified endpoint, if exists
   if (endpoint) {

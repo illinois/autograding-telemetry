@@ -6,7 +6,7 @@
 
 ## Usage:
 
-The following YAML snippet will grab the results from `illinois/autograding` and the send them via HTTP POST request `http://arbitrary.remote.server:5000/` as JSON. Additionally, `telemetry` also generates an artifact logging all of the same information.
+The following YAML snippet will grab the results from `illinois/autograding` and the send them via HTTP POST request to `http://arbitrary.remote.server:5000/` as JSON. Additionally, `telemetry` also generates an artifact logging all of the same information.
 
 ```yaml
 autograding:

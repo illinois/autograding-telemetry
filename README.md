@@ -1,4 +1,4 @@
-# telemetry
+# autograding-telemetry
 
 > Action in the illinois/autograding suite used for logging basic autograding run information.
 

@@ -1,7 +1,7 @@
 name: telemetry
-description: "Save workflow run data to a remote endpoint or an artifact"
+description: Save workflow run data to a remote endpoint or an artifact
 inputs:
-  endpoint: 
+  endpoint:
     description: >
       The URL to an HTTP endpoint to which this action will send telemetry data. Specifically,
       if `endpoint` is a valid endpoint, `telemetry` will send a POST request the endpoint
@@ -14,12 +14,12 @@ inputs:
       Boolean describing if this workflow should produce an artifact containing telemetry data.
       The data will be saved as JSON, and will contain all the same data as what is sent to `endpoint`.
       The artifact will be named `telemetry`.
-    default: false
+    default: 'false'
     required: false
   log_date:
     description: >
       Boolean describing if `telemetry` should log the date and time of the workflow run.
-    default: true
+    default: 'true'
     required: false
   user:
     description: >
@@ -30,15 +30,15 @@ inputs:
   autograding_status:
     description: >
       `autograding`'s exit code. If this field is left blank, this information is not logged.
-    default: null
+    default: 'null'
     required: false
   points:
     description: >
-      String containing the ratio of points earned to total points from the `autograding` action. 
+      String containing the ratio of points earned to total points from the `autograding` action.
       If the `autograding` action has not been used in the same workflow as this action or if this
       action is used earlier than `autograding` in a workflow, this field should always be left
       to its default value.
-    default: null
+    default: 'null'
     required: false
   assignment:
     description: >
@@ -46,5 +46,5 @@ inputs:
     default: ''
     required: false
 runs:
-  using: "node16"
-  main: "./dist/index.js"
+  using: node16
+  main: ./dist/index.cjs

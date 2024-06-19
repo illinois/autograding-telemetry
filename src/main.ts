@@ -12,31 +12,34 @@ const REQUEST_TIMEOUT = 5000
  * @param json Stringified JSON telemtry data
  * @param endpoint URL of the endpoint
  */
-function sendJSON(json: string, endpoint: string) {
-  // Init HTTP client
-  // Make a request to the given endpoint, if specified
-  const url = new URL(endpoint)
-  const options = {
-    hostname: url.hostname,
-    port: url.port,
-    path: url.pathname,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Content-Length': json.length },
-    timeout: REQUEST_TIMEOUT,
-  }
-  const req = http.request(options, (response) => {
-    if (response.statusCode && response.statusCode >= 400)
-      core.setFailed(`Request to given endpoint return error response code ${response.statusCode}`)
-  })
-  req.on('error', (err) => {
-    core.setFailed(`Request to given endpoint failed with error: ${err}`)
-  })
-  req.on('timeout', () => {
+function sendJson(json: string, endpoint: string) {
+  const controller = new AbortController()
+  const signal = controller.signal
+
+  const tid = setTimeout(() => {
     core.setFailed(`Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`)
-    req.destroy()
+    controller.abort()
+  }, REQUEST_TIMEOUT).unref()
+
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': `${json.length}`,
+    },
+    body: json,
+    signal,
+  }).then((res) => {
+    if (res.status >= 400) {
+      const msg = `Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`
+      core.setFailed(msg)
+      return Promise.reject(msg)
+    }
+  }).catch((err) => {
+    core.setFailed(`Request to given endpoint failed with error: ${err}`)
+    clearTimeout(tid)
+    return err
   })
-  req.write(json)
-  req.end()
 }
 
 /**
@@ -87,7 +90,7 @@ export async function run() {
 
   // Send JSON to specified endpoint, if exists
   if (endpoint)
-    await sendJSON(jsonStr, endpoint)
+    await sendJson(jsonStr, endpoint)
 
   // Create an artifact, if specified
   if (createArtifact)

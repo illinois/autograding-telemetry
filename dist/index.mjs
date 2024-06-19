@@ -1,32 +1,34 @@
 import fs from 'node:fs';
-import http from 'node:http';
 import artifact from '@actions/artifact';
 import core from '@actions/core';
 
 const REQUEST_TIMEOUT = 5e3;
-function sendJSON(json, endpoint) {
-  const url = new URL(endpoint);
-  const options = {
-    hostname: url.hostname,
-    port: url.port,
-    path: url.pathname,
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Content-Length": json.length },
-    timeout: REQUEST_TIMEOUT
-  };
-  const req = http.request(options, (response) => {
-    if (response.statusCode && response.statusCode >= 400)
-      core.setFailed(`Request to given endpoint return error response code ${response.statusCode}`);
-  });
-  req.on("error", (err) => {
-    core.setFailed(`Request to given endpoint failed with error: ${err}`);
-  });
-  req.on("timeout", () => {
+function sendJson(json, endpoint) {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const tid = setTimeout(() => {
     core.setFailed(`Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`);
-    req.destroy();
+    controller.abort();
+  }, REQUEST_TIMEOUT).unref();
+  return fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": `${json.length}`
+    },
+    body: json,
+    signal
+  }).then((res) => {
+    if (res.status >= 400) {
+      const msg = `Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`;
+      core.setFailed(msg);
+      return Promise.reject(msg);
+    }
+  }).catch((err) => {
+    core.setFailed(`Request to given endpoint failed with error: ${err}`);
+    clearTimeout(tid);
+    return err;
   });
-  req.write(json);
-  req.end();
 }
 async function uploadArtifact(json, assignmentName) {
   const artifactClient = artifact.create();
@@ -59,7 +61,7 @@ async function run() {
     json.autograding_status = autogradingStatus;
   const jsonStr = JSON.stringify(json);
   if (endpoint)
-    await sendJSON(jsonStr, endpoint);
+    await sendJson(jsonStr, endpoint);
   if (createArtifact)
     await uploadArtifact(jsonStr, assignment);
 }

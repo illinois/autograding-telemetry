@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import http from 'node:http'
 import artifact from '@actions/artifact'
 import core from '@actions/core'
 

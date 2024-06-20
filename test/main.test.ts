@@ -17,7 +17,7 @@ describe('action', () => {
   })
 
   it('should send telemetry info to endpoint', async () => {
-    vi.setSystemTime(new Date(2024, 0, 1))
+    vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
     const input = {
       endpoint: MOCK_SERVER_ENDPOINT,
       log_date: new Date().toISOString(),
@@ -37,7 +37,7 @@ describe('action', () => {
         {
           "assignment": "mp-mazes",
           "autograding_status": "success",
-          "date": "2024-01-01T06:00:00.000Z",
+          "date": "2024-01-01T00:00:00.000Z",
           "points": "21/42",
         },
       ]

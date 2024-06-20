@@ -1,7 +1,4 @@
-import * as main from '../src/main'
-
-// Mock the action's entrypoint
-const runMock = vi.spyOn(main, 'run')
+import { runMock } from './mocks'
 
 describe('index', () => {
   it('calls run when imported', async () => {

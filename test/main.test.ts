@@ -1,8 +1,5 @@
 import * as main from '../src/main'
-import { MOCK_SERVER_ENDPOINT, errorMock, getInputMock, jsonHandlerMock, setFailedMock } from './mocks'
-
-// Mock the action's main function
-const runMock = vi.spyOn(main, 'run')
+import { MOCK_SERVER_ENDPOINT, errorMock, getInputMock, jsonHandlerMock, runMock, setFailedMock } from './mocks'
 
 describe('action', () => {
   it('should fail if nothing is set', async () => {
@@ -20,9 +17,11 @@ describe('action', () => {
     vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
     const input = {
       endpoint: MOCK_SERVER_ENDPOINT,
-      log_date: new Date().toISOString(),
+      token: 'some_token',
+      upstream_repo: 'dsdiscovery/microprojects',
+      log_date: 'true',
       points: '21/42',
-      assignment: 'mp-mazes',
+      assignment: 'microproject-test',
       autograding_status: 'success',
     }
     getInputMock.mockImplementation(name => input[name as keyof typeof input] ?? '')
@@ -35,10 +34,17 @@ describe('action', () => {
     expect(jsonHandlerMock.mock.calls[0]).toMatchInlineSnapshot(`
       [
         {
-          "assignment": "mp-mazes",
+          "assignment": "microproject-test",
           "autograding_status": "success",
           "date": "2024-01-01T00:00:00.000Z",
+          "meta": {},
           "points": "21/42",
+          "repo": "microprojects",
+          "token": "some_token",
+          "upstream_ref": "microproject-test",
+          "upstream_repo": "dsdiscovery/microprojects",
+          "username": "little_johnny",
+          "workflow_ref": "little_johnny/microprojects/.github/workflows/microproject-test-autograder-action.yml@refs/heads/my_branch",
         },
       ]
     `)

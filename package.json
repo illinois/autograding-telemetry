@@ -25,7 +25,8 @@
   "dependencies": {
     "@actions/artifact": "^1.1.1",
     "@actions/core": "^1.10.0",
-    "@actions/github": "^5.1.1"
+    "@actions/github": "^5.1.1",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.18.1",

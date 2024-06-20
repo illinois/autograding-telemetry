@@ -5,13 +5,12 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+  vi.clearAllMocks()
   server.resetHandlers()
-  vi.useFakeTimers()
 })
 
 afterEach(() => {
   server.resetHandlers()
-  vi.useRealTimers()
 })
 
 afterAll(() => {

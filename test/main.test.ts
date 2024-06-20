@@ -1,22 +1,10 @@
-import * as core from '@actions/core'
-
 import * as main from '../src/main'
-import { MOCK_SERVER_ENDPOINT, jsonHandler } from './mocks'
+import { MOCK_SERVER_ENDPOINT, errorMock, getInputMock, jsonHandlerMock, setFailedMock } from './mocks'
 
 // Mock the action's main function
 const runMock = vi.spyOn(main, 'run')
 
-// eslint-disable-next-line antfu/top-level-function
-const noop = (..._: any[]): any => {}
-const errorMock = vi.spyOn(core, 'error').mockImplementation(noop)
-const getInputMock = vi.spyOn(core, 'getInput').mockImplementation(noop)
-const setFailedMock = vi.spyOn(core, 'setFailed').mockImplementation(console.error)
-
 describe('action', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('should fail if nothing is set', async () => {
     getInputMock.mockImplementation(() => '')
     await main.run()
@@ -39,15 +27,21 @@ describe('action', () => {
     }
     getInputMock.mockImplementation(name => input[name as keyof typeof input] ?? '')
 
-    expect(jsonHandler).not.toHaveBeenCalled()
+    expect(jsonHandlerMock).not.toHaveBeenCalled()
     await main.run()
     expect(runMock).toHaveReturned()
     expect(setFailedMock).not.toHaveBeenCalled()
-    expect(jsonHandler).toHaveBeenCalledWith(({
-      assignment: input.assignment,
-      points: input.points,
-      autograding_status: input.autograding_status,
-      date: input.log_date,
-    }))
+    expect(jsonHandlerMock.mock.calls.length).toBe(1)
+    expect(jsonHandlerMock.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        {
+          "assignment": "mp-mazes",
+          "autograding_status": "success",
+          "date": "2024-01-01T06:00:00.000Z",
+          "points": "21/42",
+        },
+      ]
+    `)
+    vi.useRealTimers()
   })
 })

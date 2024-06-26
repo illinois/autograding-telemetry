@@ -100,7 +100,7 @@ function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: 
     signal,
   })
     .then((res) => {
-      clearInterval(tid)
+      clearTimeout(tid)
       if (res.status >= 400) {
         const msg = `Request to given endpoint return error response code ${res.status}`
         res.text().then(core.error)

@@ -28,7 +28,7 @@ autograding:
       if: ${{ always() }}
       uses: illinois/telemetry@v1
       with:
-        endpoint: 'http://arbitrary.remote.server/'
+        endpoint: 'http://arbitrary.remote.server:5000/'
         create_artifact: true
         log_date: true
         assignment: mp1-autograding
@@ -37,15 +37,23 @@ autograding:
         points: ${{ steps.autograding.outputs.Points }}
 ```
 
-Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requests, the server will receive the following JSON:
+Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requests, the server may receive the following JSON:
 
 ```json
 {
-  "date": "2023-04-21T15:23:47Z", // A UTC formatted timestamp
-  "user": "jackskennel",
   "assignment": "mp1-autograding",
-  "points": "40/40",
-  "autograding_status": "success"
+  "autograding_status": "success",
+  "date": "2024-01-01T00:00:00.000Z",
+  "github_sha": "ffac537e6cbbf934b08745a378932722df287a53",
+  "meta": {},
+  "points": "21/42",
+  "repo": "microprojects",
+  "token": "ghs_5oMEt0k3n",
+  "upstream_ref": "mp1-autograding",
+  "upstream_repo": "dsdiscovery/microprojects",
+  "username": "little_johnny",
+  "workflow_ref": "little_johnny/microprojects/.github/workflows/mp1-autograding-autograder-action.yml@refs/heads/my_branch",
+  "workflow_run_id": "1658821493"
 }
 ```
 

@@ -37,4 +37,6 @@ export const githubRepoMock = vi.spyOn(github, 'context', 'get').mockReturnValue
   },
 } as any)
 
+vi.stubEnv('GITHUB_SHA', 'ffac537e6cbbf934b08745a378932722df287a53')
 vi.stubEnv('GITHUB_WORKFLOW_REF', 'little_johnny/microprojects/.github/workflows/microproject-test-autograder-action.yml@refs/heads/my_branch')
+vi.stubEnv('GITHUB_RUN_ID', '1658821493')

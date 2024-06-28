@@ -37,6 +37,7 @@ describe('action', () => {
           "assignment": "microproject-test",
           "autograding_status": "success",
           "date": "2024-01-01T00:00:00.000Z",
+          "github_sha": "ffac537e6cbbf934b08745a378932722df287a53",
           "meta": {},
           "points": "21/42",
           "repo": "microprojects",
@@ -45,6 +46,7 @@ describe('action', () => {
           "upstream_repo": "dsdiscovery/microprojects",
           "username": "little_johnny",
           "workflow_ref": "little_johnny/microprojects/.github/workflows/microproject-test-autograder-action.yml@refs/heads/my_branch",
+          "workflow_run_id": "1658821493",
         },
       ]
     `)

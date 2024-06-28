@@ -17,12 +17,7 @@ export async function run() {
   }
 
   const inputs = getInputs()
-  // if (!inputs) {
-  //   core.setFailed("Could not get action inputs")
-  //   return
-  // }
-
-  // core.debug(JSON.stringify(inputs))
+  core.debug(`inputs: ${JSON.stringify(inputs)}`)
 
   if (endpoint && inputs.token == null) {
     core.setFailed('Could not find GitHub token')
@@ -37,10 +32,8 @@ export async function run() {
   if (endpoint)
     promises.push(sendTelemetryInfo(info, endpoint).catch(core.setFailed))
 
-  delete inputs.token
-
   // Create an artifact, if specified
-  // todo: omit sensitive info
+  delete info.token
   const jsonInfo = JSON.stringify(info)
   if (createArtifact)
     promises.push(uploadArtifact(jsonInfo, inputs.assignment))
@@ -69,7 +62,9 @@ function getTelemetryInfo(inputs: ReturnType<typeof getInputs>) {
     upstream_ref: inputs.upstream_ref || inputs.assignment,
     username: github.context.repo.owner,
     repo: github.context.repo.repo,
+    github_sha: process.env.GITHUB_SHA,
     workflow_ref: process.env.GITHUB_WORKFLOW_REF!,
+    workflow_run_id: process.env.GITHUB_RUN_ID!,
   }
 }
 

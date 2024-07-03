@@ -33,8 +33,6 @@ autograding:
         log_date: true
         assignment: mp1-autograding
         upstream_repo: dsdiscovery/microprojects
-        autograding_status: ${{ steps.autograding.outcome }}
-        points: ${{ steps.autograding.outputs.Points }}
 ```
 
 Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requests, the server may receive the following JSON:
@@ -42,11 +40,9 @@ Assuming `http://arbitrary.remote.server:5000/` is a route that allows POST requ
 ```json
 {
   "assignment": "mp1-autograding",
-  "autograding_status": "success",
   "date": "2024-01-01T00:00:00.000Z",
   "github_sha": "ffac537e6cbbf934b08745a378932722df287a53",
   "meta": {},
-  "points": "21/42",
   "repo": "microprojects",
   "token": "ghs_5oMEt0k3n",
   "upstream_ref": "mp1-autograding",

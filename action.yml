@@ -5,16 +5,8 @@ inputs:
     description: >
       The URL to an HTTP endpoint to which this action will send telemetry data. Specifically,
       if `endpoint` is a valid endpoint, `telemetry` will send a POST request the endpoint
-      containing JSON-formatted telemetry data in the request body. If this field is left blank,
-      `create_artifact` must be set to `true`. Otherwise, this action will fail immediately.
-    required: false
-  create_artifact:
-    description: >
-      Boolean describing if this workflow should produce an artifact containing telemetry data.
-      The data will be saved as JSON, and will contain all the same data as what is sent to `endpoint`.
-      The artifact will be named `telemetry`.
-    default: 'false'
-    required: false
+      containing JSON-formatted telemetry data in the request body.
+    required: true
   token:
     description: >
       GitHub token used to check repository content and provide feedback. By default,
@@ -32,22 +24,6 @@ inputs:
     description: >
       The branch, tag or SHA of the upstream repo. Uses the default branch if unspecified,
       or the assignment name if it is specified.
-    required: false
-  log_date:
-    description: >
-      Boolean describing if `telemetry` should log the date and time of the workflow run.
-    default: 'true'
-    required: false
-  autograding_status:
-    description: >
-      `autograding`'s exit code. If this field is left blank, this information is not logged.
-    required: false
-  points:
-    description: >
-      String containing the ratio of points earned to total points from the `autograding` action.
-      If the `autograding` action has not been used in the same workflow as this action or if this
-      action is used earlier than `autograding` in a workflow, this field should always be left
-      to its default value.
     required: false
   assignment:
     description: >

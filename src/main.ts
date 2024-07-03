@@ -1,6 +1,4 @@
-import fs from 'node:fs'
 import process from 'node:process'
-import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
@@ -8,72 +6,65 @@ const REQUEST_TIMEOUT = 5000
 
 export async function run() {
   const endpoint = core.getInput('endpoint')
-  const createArtifact = core.getInput('create_artifact') === 'true'
 
   // Exit early if endpoint and create_artifact are false-y values
-  if (!endpoint && !createArtifact) {
-    core.setFailed('Either an endpoint must be specified or an artifact must be created.')
+  if (!endpoint) {
+    core.setFailed('Endpoint must be specified.')
     return
   }
 
   const inputs = getInputs()
   core.debug(`inputs: ${JSON.stringify(inputs)}`)
 
-  if (endpoint && inputs.token == null) {
+  if (!inputs.token) {
     core.setFailed('Could not find GitHub token')
     return
   }
 
   const info = getTelemetryInfo(inputs)
 
-  const promises: Promise<any>[] = []
-
-  // Send JSON to specified endpoint, if exists
-  if (endpoint)
-    promises.push(sendTelemetryInfo(info, endpoint).catch(core.setFailed))
-
-  // Create an artifact, if specified
-  delete info.token
-  const jsonInfo = JSON.stringify(info)
-  if (createArtifact)
-    promises.push(uploadArtifact(jsonInfo, inputs.assignment))
-
-  await Promise.all(promises)
+  await sendTelemetryInfo(info, endpoint).catch(core.setFailed)
 }
 
-// todo: return type
+/**
+ * Retrieves the inputs for the telemetry process.
+ * @returns The telemetry inputs.
+ */
 function getInputs() {
   return {
-    date: core.getInput('log_date') === 'true' ? new Date().toISOString() : undefined,
     username: core.getInput('username') || github.context.repo.owner,
     token: core.getInput('token') || process.env.GITHUB_TOKEN,
     assignment: core.getInput('assignment') || undefined,
     upstream_repo: core.getInput('upstream_repo') || undefined,
     upstream_ref: core.getInput('upstream_ref') || undefined,
-    points: core.getInput('points') || undefined,
     autograding_status: core.getInput('autograding_status') || undefined,
     meta: JSON.parse(core.getInput('meta') || '{}'),
   }
 }
 
+/**
+ * Generates the telemetry information based on the inputs.
+ * @param inputs - The telemetry inputs.
+ * @returns The telemetry information.
+ */
 function getTelemetryInfo(inputs: ReturnType<typeof getInputs>) {
   return {
     ...inputs,
-    upstream_ref: inputs.upstream_ref || inputs.assignment,
+    date: new Date().toISOString(),
+    upstream_ref: inputs.upstream_ref || inputs.assignment || 'main',
     username: github.context.repo.owner,
     repo: github.context.repo.repo,
-    github_sha: process.env.GITHUB_SHA,
+    github_sha: process.env.GITHUB_SHA!,
     workflow_ref: process.env.GITHUB_WORKFLOW_REF!,
     workflow_run_id: process.env.GITHUB_RUN_ID!,
   }
 }
 
 /**
- * Sends telemetry JSON to a user-specified endpoint via an
- * HTTP POST request.
- *
- * @param info telemetry info
- * @param endpoint URL of the endpoint
+ * Sends telemetry JSON to a user-specified endpoint via an HTTP POST request.
+ * @param info - The telemetry info.
+ * @param endpoint - URL of the endpoint.
+ * @returns A Promise that resolves when the telemetry is sent successfully.
  */
 function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: string) {
   const json = JSON.stringify(info)
@@ -111,21 +102,4 @@ function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: 
       const msg = `Request to given endpoint failed with error: ${err}`
       return Promise.reject(new Error(msg))
     })
-}
-
-/**
- * Creates and uploads a temp JSON file containing telemtry data to Github.
- * This artifact will persist for the default number of days.
- *
- * @param json Stringified JSON telemetry data
- * @param assignmentName Name of the assignment for which an artifact is being created
- */
-async function uploadArtifact(json: string, assignmentName?: string) {
-  const artifactClient = artifact.create()
-  const artifactName = assignmentName ? `${assignmentName}-telemetry` : 'telemetry'
-  const filepath = 'temp.json'
-  fs.writeFileSync(filepath, json)
-  const response = await artifactClient.uploadArtifact(artifactName, [filepath], '.', {})
-  if (response.failedItems.length > 0)
-    core.setFailed('Artifact failed to upload to Github.')
 }

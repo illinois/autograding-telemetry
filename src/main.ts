@@ -38,6 +38,7 @@ function getInputs() {
     upstream_repo: core.getInput('upstream_repo') || undefined,
     upstream_ref: core.getInput('upstream_ref') || undefined,
     autograding_status: core.getInput('autograding_status') || undefined,
+    points: core.getInput('points') || undefined,
     meta: JSON.parse(core.getInput('meta') || '{}'),
   }
 }
@@ -54,6 +55,8 @@ function getTelemetryInfo(inputs: ReturnType<typeof getInputs>) {
     upstream_ref: inputs.upstream_ref || inputs.assignment || 'main',
     username: github.context.repo.owner,
     repo: github.context.repo.repo,
+    actor: github.context.actor,
+    ref: github.context.ref,
     github_sha: process.env.GITHUB_SHA!,
     workflow_ref: process.env.GITHUB_WORKFLOW_REF!,
     workflow_run_id: process.env.GITHUB_RUN_ID!,

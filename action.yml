@@ -34,6 +34,14 @@ inputs:
       Arbitrary metadata that gets passes directly to the telemetry endpoint, defaults to "{}".
     default: '{}'
     required: false
+  autograding_status:
+    description: >
+      Final status of the autograding action.
+    required: false
+  points:
+    description: >
+      Summary of points earned during autograding.
+    required: false
 runs:
   using: node20
   main: ./dist/index.js

@@ -42,6 +42,7 @@ describe('action', () => {
             "date": "2024-01-01T00:00:00.000Z",
             "github_sha": "ffac537e6cbbf934b08745a378932722df287a53",
             "meta": {},
+            "points": "21/42",
             "repo": "microprojects",
             "token": "some_token",
             "upstream_ref": "microproject-test",

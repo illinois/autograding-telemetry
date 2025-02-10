@@ -1,50 +1,39 @@
 name: telemetry
-description: "Save workflow run data to a remote endpoint or an artifact"
+description: Save workflow run data to a remote endpoint or an artifact
 inputs:
-  endpoint: 
+  endpoint:
     description: >
       The URL to an HTTP endpoint to which this action will send telemetry data. Specifically,
       if `endpoint` is a valid endpoint, `telemetry` will send a POST request the endpoint
-      containing JSON-formatted telemetry data in the request body. If this field is left blank,
-      `create_artifact` must be set to `true`. Otherwise, this action will fail immediately.
-    default: ''
-    required: false
-  create_artifact:
+      containing JSON-formatted telemetry data in the request body.
+    required: true
+  token:
     description: >
-      Boolean describing if this workflow should produce an artifact containing telemetry data.
-      The data will be saved as JSON, and will contain all the same data as what is sent to `endpoint`.
-      The artifact will be named `telemetry`.
-    default: false
+      GitHub token used to check repository content and provide feedback. By default,
+      this uses the repository token provided by GitHub Actions. You can customize this
+      by replacing this token with a user token which has write-access to your repository.
+      Note that the token will be accessible to all repository collaborators.
+    default: ${{ github.token }}
     required: false
-  log_date:
+  upstream_repo:
     description: >
-      Boolean describing if `telemetry` should log the date and time of the workflow run.
-    default: true
+      Upstream project repository name with owner. For example, dsdiscovery/microprojects.
+      Fails the action if endpoint is specified but upstream_repo is not.
     required: false
-  user:
+  upstream_ref:
     description: >
-      Username of the user that triggered the workflow run. If this field is left empty, this information
-      will not be logged.
-    default: ''
-    required: false
-  autograding_status:
-    description: >
-      `autograding`'s exit code. If this field is left blank, this information is not logged.
-    default: null
-    required: false
-  points:
-    description: >
-      String containing the ratio of points earned to total points from the `autograding` action. 
-      If the `autograding` action has not been used in the same workflow as this action or if this
-      action is used earlier than `autograding` in a workflow, this field should always be left
-      to its default value.
-    default: null
+      The branch, tag or SHA of the upstream repo. Uses the default branch if unspecified,
+      or the assignment name if it is specified.
     required: false
   assignment:
     description: >
       The name of the assignment for which data is being logged. If empty, this field will not be entered.
-    default: ''
+    required: false
+  meta:
+    description: >
+      Arbitrary metadata that gets passes directly to the telemetry endpoint, defaults to "{}".
+    default: '{}'
     required: false
 runs:
-  using: "node16"
-  main: "./dist/index.js"
+  using: node20
+  main: ./dist/index.js

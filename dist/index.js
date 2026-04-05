@@ -33675,22 +33675,22 @@ function getTelemetryInfo(inputs) {
  * @param endpoint - URL of the endpoint.
  * @returns A Promise that resolves when the telemetry is sent successfully.
  */
-function sendTelemetryInfo(info, endpoint) {
+async function sendTelemetryInfo(info, endpoint) {
     const json = JSON.stringify(info);
     core.debug(`Sending telemetry info: ${json}`);
     const controller = new AbortController();
     const signal = controller.signal;
     const tid = setTimeout(() => controller.abort(), REQUEST_TIMEOUT).unref();
-    return fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': `${json.length}`,
-        },
-        body: json,
-        signal,
-    })
-        .then((res) => {
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': `${json.length}`,
+            },
+            body: json,
+            signal,
+        });
         clearTimeout(tid);
         if (res.status >= 400) {
             const msg = `Request to given endpoint return error response code ${res.status}`;
@@ -33698,15 +33698,26 @@ function sendTelemetryInfo(info, endpoint) {
             return Promise.reject(new Error(msg));
         }
         return res;
-    }, (err) => {
+    }
+    catch (err) {
+        let externalIP = '';
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            externalIP = data.ip;
+            core.info(`External IP ${externalIP}`);
+        }
+        catch (error) {
+            core.error(`Error fetching external IP: ${error}`);
+        }
         if (signal.aborted) {
-            const msg = `Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`;
+            const msg = `Request to ${endpoint} from ${externalIP} exceeded ${REQUEST_TIMEOUT}ms timeout`;
             return Promise.reject(new Error(msg));
         }
         clearTimeout(tid);
-        const msg = `Request to given endpoint failed with error: ${err}`;
+        const msg = `Request to ${endpoint} from ${externalIP} failed with error: ${err}`;
         return Promise.reject(new Error(msg));
-    });
+    }
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

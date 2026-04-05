@@ -69,7 +69,7 @@ function getTelemetryInfo(inputs: ReturnType<typeof getInputs>) {
  * @param endpoint - URL of the endpoint.
  * @returns A Promise that resolves when the telemetry is sent successfully.
  */
-function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: string) {
+async function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: string) {
   const json = JSON.stringify(info)
 
   core.debug(`Sending telemetry info: ${json}`)
@@ -79,30 +79,44 @@ function sendTelemetryInfo(info: ReturnType<typeof getTelemetryInfo>, endpoint: 
 
   const tid = setTimeout(() => controller.abort(), REQUEST_TIMEOUT).unref()
 
-  return fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': `${json.length}`,
-    },
-    body: json,
-    signal,
-  })
-    .then((res) => {
-      clearTimeout(tid)
-      if (res.status >= 400) {
-        const msg = `Request to given endpoint return error response code ${res.status}`
-        res.text().then(core.error)
-        return Promise.reject(new Error(msg))
-      }
-      return res
-    }, (err) => {
-      if (signal.aborted) {
-        const msg = `Request to ${endpoint} exceeded ${REQUEST_TIMEOUT}ms timeout`
-        return Promise.reject(new Error(msg))
-      }
-      clearTimeout(tid)
-      const msg = `Request to given endpoint failed with error: ${err}`
-      return Promise.reject(new Error(msg))
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': `${json.length}`,
+      },
+      body: json,
+      signal,
     })
+
+    clearTimeout(tid)
+    if (res.status >= 400) {
+      const msg = `Request to given endpoint return error response code ${res.status}`
+      res.text().then(core.error)
+      return Promise.reject(new Error(msg))
+    }
+    return res
+  }
+  catch (err) {
+    let externalIP: string = ''
+
+    try {
+      const response = await fetch('https://api.ipify.org?format=json')
+      const data = <{ ip: string }> await response.json()
+      externalIP = data.ip
+      core.info(`External IP ${externalIP}`)
+    }
+    catch (error) {
+      core.error(`Error fetching external IP: ${error}`)
+    }
+
+    if (signal.aborted) {
+      const msg = `Request to ${endpoint} from ${externalIP} exceeded ${REQUEST_TIMEOUT}ms timeout`
+      return Promise.reject(new Error(msg))
+    }
+    clearTimeout(tid)
+    const msg = `Request to ${endpoint} from ${externalIP} failed with error: ${err}`
+    return Promise.reject(new Error(msg))
+  }
 }
